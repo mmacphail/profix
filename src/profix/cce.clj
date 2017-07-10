@@ -1,41 +1,25 @@
 (ns profix.cce
-  (:require [clj-http.client :as client]
-            [clojure.data.json :as json]
-            [clojure.string :as str]))
+  (:require [profix.http :as http]
+            [profix.resources :as rsc]))
 
-(defn client-get-request [request]
-  (client/get (request :url) {:headers    {"accept"             "application/json"
-                                           "DoNotCreateSession" "true"}
-                              :basic-auth (request :auth)}))
+(defn get-landscape-nodes
+  [req]
+  (:node (http/get-resource req rsc/landscape-nodes)))
 
-(defn throw-error-status [status]
-  (throw (Exception. (str "The following HTTP code was received: " status))))
+(defn list-inventory-products
+  ([req]
+   (list-inventory-products req ""))
+  ([req node-alias]
+   (:productInfo (:productInfos (http/get-resource req rsc/inventory-products node-alias)))))
 
-(defn client-http-request [request]
-  (let [response (client-get-request request)
-        status (str (:status response))
-        body (json/read-str (:body response)
-                            :key-fn keyword)]
-    (if (not (str/starts-with? status "2"))
-      (throw-error-status status))
-    body))
+(defn extract-product-by-node
+  [products-by-node [node-alias node-products]]
+  (assoc products-by-node node-alias
+                          (into [] (map :product node-products))))
 
-(defn def-resource
-  ([request resource] (def-resource request resource ""))
-  ([request resource resource-id]
-   (let [rsc (if-not
-               (empty? resource-id)
-               (str "/" resource-id)
-               "")]
-     (assoc request
-       :url
-       (str (:cce-host request) "/" resource rsc)))))
+(defn get-products-by-node
+  [req]
+  (let [products (group-by :nodeAlias (list-inventory-products req))]
+    (reduce extract-product-by-node {} products)))
 
-(defn get-resource
-  ([request resource] (get-resource request resource ""))
-  ([request resource resource-id]
-   (let [req (def-resource request resource resource-id)]
-     (client-http-request req))))
 
-(defn make-request [cce-host auth]
-  {:cce-host cce-host :auth auth})
