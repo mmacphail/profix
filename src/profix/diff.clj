@@ -1,6 +1,7 @@
 (ns profix.diff
   (:require [profix.http :as http]
-            [profix.resources :as rsc]))
+            [profix.resources :as rsc]
+            [profix.fix :as fix]))
 
 (defn common-product?
   [products-by-node product]
@@ -16,25 +17,9 @@
         common-products (filter common-product-to-all? all-products)]
     (into #{} (map #(dissoc % :installTime) common-products))))
 
-(defn is-test-fix [x]
-  (boolean (re-find #"(?i)test" (:displayName x))))
+(defn list-available-fixes
+  [fixes-in-inventory fixes-in-repo]
+  ())
 
-(defn is-support-patch [x]
-  (if (= (:supportPatch x) "true") true false))
 
-(defn is-manual [x]
-  (or (= (:preInstallSteps x) "true")
-      (= (:postInstallSteps x) "true")))
 
-(defn last-fix-version
-  [fixes]
-  (let [ordered-fixes (sort-by :version fixes)]
-    (last ordered-fixes)))
-
-(defn filter-stable-fixes
-  [fixes]
-  (let [stable-fixes (remove is-test-fix fixes)
-        no-patch (remove is-support-patch fixes)
-        no-manual (remove is-manual no-patch)
-       fixes-by-id (group-by :id no-manual)]
-   (flatten (map last-fix-version (vals fixes-by-id)))))

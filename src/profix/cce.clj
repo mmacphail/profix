@@ -22,7 +22,7 @@
   (let [products (group-by :nodeAlias (list-inventory-products req))]
     (reduce extract-product-by-node {} products)))
 
-(defn list-available-fixes
+(defn list-repository-fixes
   [req fixes-repository node-alias platform]
   (let [params (format "/%s?nodeAlias=%s&platform=%s&products=INSTALLED"
                        fixes-repository
@@ -32,3 +32,12 @@
     (-> (http/get-resource req rsc)
         :artifacts
         :artifact)))
+
+(defn list-inventory-fixes
+  ([req]
+   (-> (http/get-resource req rsc/inventory-fixes)
+       :fixInfos
+       :fixInfo))
+  ([req node-alias]
+   (->> (list-inventory-fixes req)
+        (filter #(= (:nodeAlias %) node-alias)))))
