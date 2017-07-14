@@ -19,7 +19,9 @@
 
 (defn list-available-fixes
   [fixes-in-inventory fixes-in-repo]
-  ())
+  (remove
+    #(fix/fix-already-installed? % fixes-in-inventory)
+    fixes-in-repo))
 
 
 

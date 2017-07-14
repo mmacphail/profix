@@ -31,11 +31,10 @@
   (and (= (:id f1) (:id f2))
        (<= 0 (compare (:version f1) (:version f2)))))
 
-(defn newest-version-installed
+(defn fix-already-installed?
   [fix inventory-fixes]
   (let [searched-fix (select-keys fix [:id :version])
         installed-fixes (into #{}
                               (map #(select-keys % [:id :version]) inventory-fixes))
-        newest-fix? (fn [f] (and (= (:id f) (:id fix))
-                                 (> (:version f) (:version fix))))]
-    (some newest-fix? installed-fixes)))
+        fix-installed? (partial newest-fix? searched-fix)]
+    (not-any? fix-installed? installed-fixes)))
