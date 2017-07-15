@@ -41,3 +41,9 @@
   ([req node-alias]
    (->> (list-inventory-fixes req)
         (filter #(= (:nodeAlias %) node-alias)))))
+
+(defn list-detailed-inventory-fixes
+  ([req]
+    (map :fix (list-inventory-fixes req)))
+  ([req node-alias]
+    (map :fix (list-inventory-fixes req node-alias))))

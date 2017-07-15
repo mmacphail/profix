@@ -29,7 +29,7 @@
                "")]
      (assoc request
        :url
-       (str (:cce-host request) "/" resource rsc)))))
+       (str (:cce-url request) "/" resource rsc)))))
 
 (defn get-resource
   ([request resource] (get-resource request resource ""))
@@ -37,5 +37,5 @@
    (let [req (def-resource request resource resource-id)]
      (client-http-request req))))
 
-(defn make-request [cce-host auth]
-  {:cce-host cce-host :auth auth})
+(defn make-request [cce-url auth]
+  {:cce-url cce-url :auth auth})
