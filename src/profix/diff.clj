@@ -22,6 +22,3 @@
   (remove
     #(fix/fix-already-installed? % fixes-in-inventory)
     fixes-in-repo))
-
-
-

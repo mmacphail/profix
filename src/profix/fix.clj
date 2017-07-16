@@ -37,4 +37,6 @@
         installed-fixes (into #{}
                               (map #(select-keys % [:id :version]) inventory-fixes))
         fix-installed? (partial newest-fix? searched-fix)]
-    (not-any? fix-installed? installed-fixes)))
+    (if (empty? inventory-fixes)
+      false
+      (not-any? fix-installed? installed-fixes))))

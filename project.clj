@@ -1,4 +1,4 @@
-(defproject profix "1.0.0-rc2"
+(defproject profix "1.0.0-rc3"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
