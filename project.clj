@@ -7,4 +7,6 @@
                  [org.clojure/data.json "0.2.6"]
                  [clj-http "3.6.1"]
                  [org.clojure/tools.cli "0.3.5"]]
+  :profiles {:uberjar {:aot :all}
+             :dev {:plugins [[lein-binplus "0.6.2"]]}}
   :main profix.core)
