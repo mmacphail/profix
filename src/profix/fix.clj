@@ -26,17 +26,26 @@
        (map last-fix-version)
        (flatten)))
 
+(defn contains-fix-any-version?
+  [fix inventory-fixes]
+  (let [select-id-only #(select-keys % [:id])
+        inv-of-ids (into #{} (map select-id-only inventory-fixes))
+        fix-id (select-id-only fix)]
+    (contains? inv-of-ids fix-id)))
+
 (defn newest-fix?
   [f1 f2]
   (and (= (:id f1) (:id f2))
        (<= 0 (compare (:version f1) (:version f2)))))
 
+(defn newest-version-of-fix-in-inventory?
+  [fix inventory-fixes]
+  (let [is-same-fix-id? (fn [f] (= (:id f) (:id fix)))
+        fixes-same-id (filter is-same-fix-id? inventory-fixes)]
+    (every? #(newest-fix? % fix) fixes-same-id)))
+
 (defn fix-already-installed?
   [fix inventory-fixes]
-  (let [searched-fix (select-keys fix [:id :version])
-        installed-fixes (into #{}
-                              (map #(select-keys % [:id :version]) inventory-fixes))
-        fix-installed? (partial newest-fix? searched-fix)]
-    (if (empty? inventory-fixes)
-      false
-      (not-any? fix-installed? installed-fixes))))
+    (if (contains-fix-any-version? fix inventory-fixes)
+        (newest-version-of-fix-in-inventory? fix inventory-fixes)
+      false))
