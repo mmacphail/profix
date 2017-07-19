@@ -12,6 +12,10 @@
   ([req node-alias]
    (:productInfo (:productInfos (http/get-resource req rsc/inventory-products node-alias)))))
 
+(defn list-detailed-inventory-products
+  [req node-alias]
+  (map :product (list-inventory-products req node-alias)))
+
 (defn extract-product-by-node
   [products-by-node [node-alias node-products]]
   (assoc products-by-node node-alias
