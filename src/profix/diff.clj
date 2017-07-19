@@ -17,23 +17,23 @@
         common-products (filter common-product-to-all? all-products)]
     (into #{} (map #(dissoc % :installTime) common-products))))
 
-(defn get-ids-of-repos
-  [repo & repos]
-  (let [all-repos (conj repos repo)
+(defn get-ids-of-sources-products
+  [source & sources]
+  (let [all-sources (conj sources source)
         ids-of (fn [ps] (into #{} (map #(:id %) ps)))]
-    (map ids-of all-repos)))
+    (map ids-of all-sources)))
 
-(defn compare-repos
-  [fn repo & repos]
-  (let [all-products-by-id (group-by :id (apply concat repo repos))
+(defn compare-products
+  [fn source & sources]
+  (let [all-products-by-id (group-by :id (apply concat source sources))
         find-product #(first (get all-products-by-id %))
-        repos-id (apply get-ids-of-repos repo repos)
-        common-products-id (apply fn repos-id)]
+        sources-id (apply get-ids-of-sources-products source sources)
+        common-products-id (apply fn sources-id)]
     (map find-product common-products-id)))
 
-(defn list-common-products-for-repos
+(defn list-common-products
   [repo & repos]
-  (apply compare-repos clojure.set/intersection repo repos))
+  (apply compare-products clojure.set/intersection repo repos))
 
 (defn list-available-fixes
   [fixes-in-inventory fixes-in-repo]
