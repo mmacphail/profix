@@ -17,7 +17,7 @@
   (assoc products-by-node node-alias
                           (into [] (map :product node-products))))
 
-(defn get-products-by-node
+(defn list-products-by-node
   [req]
   (let [products (group-by :nodeAlias (list-inventory-products req))]
     (reduce extract-product-by-node {} products)))
@@ -47,3 +47,9 @@
     (map :fix (list-inventory-fixes req)))
   ([req node-alias]
     (map :fix (list-inventory-fixes req node-alias))))
+
+(defn list-repository-products-content
+  [req repo]
+  (-> (http/get-resource req rsc/repository-products-content repo)
+      :artifacts
+      :artifact))

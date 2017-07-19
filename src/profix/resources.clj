@@ -7,3 +7,5 @@
 (def inventory-fixes "inventory/fixes")
 
 (def repository-fixes-content "repository/fixes/content")
+
+(def repository-products-content "repository/products/content")
