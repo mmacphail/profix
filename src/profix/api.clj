@@ -6,7 +6,7 @@
 
 (defmethod load-source :store [source]
   (let [{name :name} source]
-    (store/load-json name)))
+    (store/load-entry name)))
 
 (defmethod load-source :repo [source]
   (let [{repo :name, req :req} source]
@@ -17,13 +17,13 @@
     (cce/list-detailed-inventory-products req node)))
 
 (defmethod load-source :default [source]
-  (store/load-json source))
+  (store/load-entry source))
 
 (defmulti save (fn [source] (:from source)))
 (defmethod save :store [source] (println "This source is already written in the store"))
-(defmethod save :repo [source] (store/store-json (:name source) (load-source source)))
-(defmethod save :inventory [source] (store/store-json (:name source) (load-source source)))
-(defmethod save :mem [source] (store/store-json (:name source) (:content source)))
+(defmethod save :repo [source] (store/write-entry (:name source) (load-source source)))
+(defmethod save :inventory [source] (store/write-entry (:name source) (load-source source)))
+(defmethod save :mem [source] (store/write-entry (:name source) (:content source)))
 
 (defn store-src [name] {:from :store, :name name})
 
@@ -38,3 +38,9 @@
 (defn alias-source [source alias]
   (let [mem (mem-src alias (load-source source))]
     (save mem)))
+
+(defn delete-source [source]
+  (store/delete-entry (:name source)))
+
+(defn list-store-sources []
+  (store/list-entries))
