@@ -20,8 +20,8 @@
   (path->file (resolvePath path name)))
 
 (defn delete
-  [path]
-  (fs/delete (path->file path)))
+  [file]
+  (fs/delete file))
 
 (defn list-files
   [path]
