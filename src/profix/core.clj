@@ -27,6 +27,9 @@
     :default "LNXAMD64"]
    ["-s" "--secret PASSWORD" "Administrator secret"
     :default "manage"]
+   ["-i" "--insecure-ssl VALUE" "Set to 'true' if CCE certificates are self-signed, 'false' otherwise"
+    :default true
+    :parse-fn #(Boolean/parseBoolean %)]
    ["-h" "--help"]])
 
 (defn usage [options-summary]
@@ -71,10 +74,10 @@
     (str protocol "://" host ":" port "/cce")))
 
 (defn list-available-fixes [options node-alias]
-  (let [{:keys [secret fixesRepo platform]} options
+  (let [{:keys [secret insecure-ssl fixesRepo platform]} options
         cce-url (build-cce-url options)
-        token (format "Administrator:%s" secret)
-        req (http/make-request cce-url token)
+        token ["Administrator" secret]
+        req (http/make-request cce-url token insecure-ssl)
         inventory-fixes (cce/list-detailed-inventory-fixes req node-alias)
         repo-fixes (fix/filter-stable-fixes (cce/list-repository-fixes req fixesRepo node-alias platform))]
     (diff/list-available-fixes inventory-fixes repo-fixes)))
