@@ -1,24 +1,27 @@
 (ns profix.http
-  (:require [clj-http.client :as client]
+  (:require [org.httpkit.client :as httpk]
             [clojure.data.json :as json]
             [clojure.string :as str]))
 
-(defn client-get-request [request]
-  (client/get (request :url) {:headers    {"accept"             "application/json"
-                                           "DoNotCreateSession" "true"}
-                              :basic-auth (request :auth)}))
+(def headers {"accept" "application/json"
+              "DoNotCreateSession" "true"})
+
+(defn opts [auth insecure]
+  {:headers headers
+   :basic-auth auth
+   :insecure? insecure})
+
+(defn client-get-request [{:keys [url auth insecure]}]
+  @(httpk/get url (opts auth insecure)))
 
 (defn throw-error-status [status]
   (throw (Exception. (str "The following HTTP code was received: " status))))
 
 (defn client-http-request [request]
-  (let [response (client-get-request request)
-        status (str (:status response))
-        body (json/read-str (:body response)
-                            :key-fn keyword)]
+  (let [{:keys [body status]} (client-get-request request)]
     (if (not (str/starts-with? status "2"))
       (throw-error-status status))
-    body))
+      (json/read-str body :key-fn keyword)))
 
 (defn def-resource
   ([request resource] (def-resource request resource ""))
@@ -37,5 +40,5 @@
    (let [req (def-resource request resource resource-id)]
      (client-http-request req))))
 
-(defn make-request [cce-url auth]
-  {:cce-url cce-url :auth auth})
+(defn make-request [cce-url auth insecure]
+  {:cce-url cce-url :auth auth :insecure insecure})
