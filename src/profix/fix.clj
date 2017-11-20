@@ -1,7 +1,9 @@
 (ns profix.fix)
 
 (defn test-fix? [x]
-  (boolean (re-find #"(?i)test" (:displayName x))))
+  (if (nil? (:displayName x))
+    false
+    (boolean (re-find #"(?i)test" (:displayName x)))))
 
 (defn support-patch? [x]
   (if (= (:supportPatch x) "true") true false))
@@ -46,6 +48,6 @@
 
 (defn fix-already-installed?
   [fix inventory-fixes]
-    (if (contains-fix-any-version? fix inventory-fixes)
-        (newest-version-of-fix-in-inventory? fix inventory-fixes)
-      false))
+  (if (contains-fix-any-version? fix inventory-fixes)
+    (newest-version-of-fix-in-inventory? fix inventory-fixes)
+    false))

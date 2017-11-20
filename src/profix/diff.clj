@@ -1,5 +1,6 @@
 (ns profix.diff
-  (:require [profix.http :as http]
+  (:require [clojure.set :as set]
+            [profix.http :as http]
             [profix.resources :as rsc]
             [profix.fix :as fix]))
 
@@ -33,7 +34,7 @@
 
 (defn list-common-products
   [repo & repos]
-  (apply compare-products clojure.set/intersection repo repos))
+  (apply compare-products set/intersection repo repos))
 
 (defn list-available-fixes
   [fixes-in-inventory fixes-in-repo]
